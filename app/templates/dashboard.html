@@ -5,12 +5,15 @@
   <title>SecureScanner Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="bg-gray-50 min-h-screen p-6">
 
-  <div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6">
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6 relative">
     <h1 class="text-2xl font-semibold mb-4">SecureScanner</h1>
-
+   <img src="{{ url_for('static', filename='images/moon.png') }}"
+     id="theme-icon"
+     class="w-6 h-6 cursor-pointer absolute top-4 right-4 z-10" />
     <label for="scanSelector" class="block text-sm font-medium text-gray-700 mb-1">Choose Scan Type</label>
     <select id="scanSelector"
             class="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -52,6 +55,29 @@
         forms[key].classList.toggle("hidden", key !== selected);
       }
     });
+  const icon = document.getElementById("theme-icon");
+
+  function setTheme(mode) {
+    if (mode === "dark") {
+      document.body.classList.add("dark-mode");
+      icon.src = "{{ url_for('static', filename='images/sun.png') }}";
+    } else {
+      document.body.classList.remove("dark-mode");
+      icon.src = "{{ url_for('static', filename='images/moon.png') }}";
+    }
+  }
+
+  // Load saved preference
+  const savedTheme = localStorage.getItem("theme");
+  setTheme(savedTheme === "dark" ? "dark" : "light");
+
+  // Toggle on click
+  icon.addEventListener("click", () => {
+    const isDark = document.body.classList.contains("dark-mode");
+    const newTheme = isDark ? "light" : "dark";
+    localStorage.setItem("theme", newTheme);
+    setTheme(newTheme);
+  });
   </script>
 </body>
 </html>
