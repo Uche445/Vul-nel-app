@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-10">
+  <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Scan Details</h1>
+
+  <div class="space-y-4 text-gray-700 dark:text-gray-200">
+    <div><strong>Scan Type:</strong> {{ result.scan_type }}</div>
+    <div><strong>Target:</strong> {{ result.target }}</div>
+    <div>
+      <strong>Status:</strong>
+      {% if result.status == 'Completed' %}
+        <span class="text-green-500 font-semibold">✅ {{ result.status }}</span>
+      {% elif result.status == 'In Progress' %}
+        <span class="text-yellow-500 font-semibold">⏳ {{ result.status }}</span>
+      {% elif result.status == 'Error' %}
+        <span class="text-red-500 font-semibold">❌ {{ result.status }}</span>
+      {% else %}
+        {{ result.status }}
+      {% endif %}
+    </div>
+    <div><strong>Time:</strong> {{ result.timestamp }}</div>
+
+    <div>
+  <strong>Findings:</strong>
+  {% if result.scan_type == "Port Scan" and "open ports" in result.findings %}
+    <p class="mt-1">{{ result.findings }}</p>
+  {% else %}
+    <p class="mt-1">{{ result.findings or "— No findings —" }}</p>
+  {% endif %}
+</div>
+<a href="{{ url_for('export_csv') }}"
+   class="inline-block mb-4 bg-secondary text-black px-4 py-2 rounded hover:bg-secondary/80 transition">
+  ⬇ Export as CSV
+</a>
+<a href="{{ url_for('export_pdf', result_id=result.id) }}"
+   class="inline-block mb-4 bg-secondary text-black px-4 py-2 rounded hover:bg-secondary/80 transition">
+  ⬇ Export as PDF
+</a>
+
+  </div>
+
+  <div class="mt-6">
+    <a href="{{ url_for('index') }}"
+       class="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-primary/80 transition">
+      ← Back to Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}

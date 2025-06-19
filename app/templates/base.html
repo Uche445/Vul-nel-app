@@ -1,0 +1,15 @@
+<!-- app/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en" class="transition duration-300">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}SecureScanner{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen p-6 transition duration-300">
+  {% block content %}{% endblock %}
+</body>
+</html>

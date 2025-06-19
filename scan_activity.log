@@ -282,3 +282,111 @@
 2025-06-19 09:22:47,566 - INFO - 127.0.0.1 - - [19/Jun/2025 09:22:47] "GET /logs HTTP/1.1" 200 -
 2025-06-19 09:23:47,545 - INFO - 127.0.0.1 - - [19/Jun/2025 09:23:47] "GET /logs HTTP/1.1" 200 -
 2025-06-19 09:24:47,561 - INFO - 127.0.0.1 - - [19/Jun/2025 09:24:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:25:47,545 - INFO - 127.0.0.1 - - [19/Jun/2025 09:25:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:26:47,552 - INFO - 127.0.0.1 - - [19/Jun/2025 09:26:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:27:47,561 - INFO - 127.0.0.1 - - [19/Jun/2025 09:27:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:28:47,917 - INFO - 127.0.0.1 - - [19/Jun/2025 09:28:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:29:47,590 - INFO - 127.0.0.1 - - [19/Jun/2025 09:29:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:30:47,552 - INFO - 127.0.0.1 - - [19/Jun/2025 09:30:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:31:47,542 - INFO - 127.0.0.1 - - [19/Jun/2025 09:31:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:32:47,568 - INFO - 127.0.0.1 - - [19/Jun/2025 09:32:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:33:47,546 - INFO - 127.0.0.1 - - [19/Jun/2025 09:33:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:34:47,574 - INFO - 127.0.0.1 - - [19/Jun/2025 09:34:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:35:47,542 - INFO - 127.0.0.1 - - [19/Jun/2025 09:35:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:36:47,568 - INFO - 127.0.0.1 - - [19/Jun/2025 09:36:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:37:47,545 - INFO - 127.0.0.1 - - [19/Jun/2025 09:37:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:38:47,575 - INFO - 127.0.0.1 - - [19/Jun/2025 09:38:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:39:47,544 - INFO - 127.0.0.1 - - [19/Jun/2025 09:39:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:40:47,561 - INFO - 127.0.0.1 - - [19/Jun/2025 09:40:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:41:47,550 - INFO - 127.0.0.1 - - [19/Jun/2025 09:41:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:42:47,576 - INFO - 127.0.0.1 - - [19/Jun/2025 09:42:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:43:47,546 - INFO - 127.0.0.1 - - [19/Jun/2025 09:43:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:44:47,570 - INFO - 127.0.0.1 - - [19/Jun/2025 09:44:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:45:47,543 - INFO - 127.0.0.1 - - [19/Jun/2025 09:45:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:46:47,580 - INFO - 127.0.0.1 - - [19/Jun/2025 09:46:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:50:11,343 - INFO - 127.0.0.1 - - [19/Jun/2025 09:50:11] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:50:47,559 - INFO - 127.0.0.1 - - [19/Jun/2025 09:50:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:51:47,529 - INFO - 127.0.0.1 - - [19/Jun/2025 09:51:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:52:47,517 - INFO - 127.0.0.1 - - [19/Jun/2025 09:52:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:53:47,539 - INFO - 127.0.0.1 - - [19/Jun/2025 09:53:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:54:47,523 - INFO - 127.0.0.1 - - [19/Jun/2025 09:54:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:55:47,532 - INFO - 127.0.0.1 - - [19/Jun/2025 09:55:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:56:47,543 - INFO - 127.0.0.1 - - [19/Jun/2025 09:56:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:57:47,537 - INFO - 127.0.0.1 - - [19/Jun/2025 09:57:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:58:47,527 - INFO - 127.0.0.1 - - [19/Jun/2025 09:58:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 09:59:47,544 - INFO - 127.0.0.1 - - [19/Jun/2025 09:59:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:00:47,529 - INFO - 127.0.0.1 - - [19/Jun/2025 10:00:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:01:47,538 - INFO - 127.0.0.1 - - [19/Jun/2025 10:01:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:02:27,214 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\ssh_scanner.py', reloading
+2025-06-19 10:02:27,216 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\ssh_scanner.py', reloading
+2025-06-19 10:02:27,446 - INFO -  * Restarting with stat
+2025-06-19 10:02:27,703 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\ssh_scanner.py', reloading
+2025-06-19 10:02:27,705 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\ssh_scanner.py', reloading
+2025-06-19 10:02:27,951 - INFO -  * Restarting with stat
+2025-06-19 10:02:29,905 - WARNING -  * Debugger is active!
+2025-06-19 10:02:29,905 - WARNING -  * Debugger is active!
+2025-06-19 10:02:29,909 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:02:47,540 - INFO - 127.0.0.1 - - [19/Jun/2025 10:02:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:03:47,525 - INFO - 127.0.0.1 - - [19/Jun/2025 10:03:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:04:47,549 - INFO - 127.0.0.1 - - [19/Jun/2025 10:04:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:05:42,018 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\tcp_ip_scanner.py', reloading
+2025-06-19 10:05:42,030 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\tcp_ip_scanner.py', reloading
+2025-06-19 10:05:42,043 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\tcp_ip_scanner.py', reloading
+2025-06-19 10:05:42,092 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\scanner\\tcp_ip_scanner.py', reloading
+2025-06-19 10:05:42,259 - INFO -  * Restarting with stat
+2025-06-19 10:05:42,340 - INFO -  * Restarting with stat
+2025-06-19 10:05:43,606 - WARNING -  * Debugger is active!
+2025-06-19 10:05:43,609 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:05:43,609 - WARNING -  * Debugger is active!
+2025-06-19 10:05:43,612 - WARNING -  * Debugger is active!
+2025-06-19 10:05:43,613 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:05:43,616 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:05:43,616 - WARNING -  * Debugger is active!
+2025-06-19 10:05:43,619 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:05:47,526 - INFO - 127.0.0.1 - - [19/Jun/2025 10:05:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:06:47,533 - INFO - 127.0.0.1 - - [19/Jun/2025 10:06:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:07:11,407 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:11,408 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:11,410 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:11,412 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:11,599 - INFO -  * Restarting with stat
+2025-06-19 10:07:11,604 - INFO -  * Restarting with stat
+2025-06-19 10:07:12,832 - WARNING -  * Debugger is active!
+2025-06-19 10:07:12,833 - WARNING -  * Debugger is active!
+2025-06-19 10:07:12,834 - WARNING -  * Debugger is active!
+2025-06-19 10:07:12,836 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:12,837 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:12,838 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:12,854 - WARNING -  * Debugger is active!
+2025-06-19 10:07:12,857 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:21,121 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:21,123 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:21,128 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:21,129 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:07:21,335 - INFO -  * Restarting with stat
+2025-06-19 10:07:21,335 - INFO -  * Restarting with stat
+2025-06-19 10:07:22,700 - WARNING -  * Debugger is active!
+2025-06-19 10:07:22,703 - WARNING -  * Debugger is active!
+2025-06-19 10:07:22,704 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:22,707 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:22,707 - WARNING -  * Debugger is active!
+2025-06-19 10:07:22,712 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:22,737 - WARNING -  * Debugger is active!
+2025-06-19 10:07:22,741 - INFO -  * Debugger PIN: 962-865-343
+2025-06-19 10:07:47,540 - INFO - 127.0.0.1 - - [19/Jun/2025 10:07:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:08:47,525 - INFO - 127.0.0.1 - - [19/Jun/2025 10:08:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:09:47,569 - INFO - 127.0.0.1 - - [19/Jun/2025 10:09:47] "GET /logs HTTP/1.1" 200 -
+2025-06-19 10:09:47,761 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:09:47,763 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:09:47,891 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:09:47,892 - INFO -  * Detected change in 'C:\\Users\\Uchechukwu\\Documents\\Programming\\flask-app\\run.py', reloading
+2025-06-19 10:09:47,909 - INFO -  * Restarting with stat
+2025-06-19 10:09:47,916 - INFO -  * Restarting with stat
+2025-06-19 10:13:37,636 - INFO -  * Restarting with stat
+2025-06-19 10:13:37,651 - INFO -  * Restarting with stat
+2025-06-19 10:37:22,067 - INFO -  * Restarting with stat
+2025-06-19 10:37:22,081 - INFO -  * Restarting with stat
+2025-06-19 10:49:28,402 - INFO -  * Restarting with stat
+2025-06-19 10:49:28,473 - INFO -  * Restarting with stat
+2025-06-19 10:49:36,303 - INFO -  * Restarting with stat
+2025-06-19 10:49:36,324 - INFO -  * Restarting with stat
