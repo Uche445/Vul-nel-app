@@ -1,9 +1,18 @@
 <form method="POST" action="{{ url_for('scan') }}" class="space-y-4">
   <input type="hidden" name="scan_type" value="Port Scan">
-  <input type="text" name="target" placeholder="IP or Domain" class="w-full px-4 py-2 border rounded">
-  <div class="flex space-x-2">
-    <input type="text" name="start_port" placeholder="Start Port" class="w-1/2 px-4 py-2 border rounded">
-    <input type="text" name="end_port" placeholder="End Port" class="w-1/2 px-4 py-2 border rounded">
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Target IP/Domain</label>
+    <input type="text" name="target" class="w-full px-3 py-2 border rounded-lg" placeholder="e.g. scanme.nmap.org">
   </div>
-  <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded">Start Port Scan</button>
+
+  <div class="flex space-x-2">
+    <input type="text" name="start_port" class="w-1/2 px-3 py-2 border rounded-lg" placeholder="Start port">
+    <input type="text" name="end_port" class="w-1/2 px-3 py-2 border rounded-lg" placeholder="End port">
+  </div>
+
+  <button type="submit"
+          class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+    Start Port Scan
+  </button>
 </form>

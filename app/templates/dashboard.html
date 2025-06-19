@@ -74,6 +74,71 @@
     <div id="sshForm" class="hidden">{% include "partials/ssh_form.html" %}</div>
   </div>
 
+  <!-- Scan Results Section -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Scan Results</h2>
+    <div class="flex items-center space-x-2 text-sm text-gray-500">
+      <span>Last updated: just now</span>
+      <button class="p-2 text-gray-400 hover:text-primary">
+        <i class="ri-refresh-line ri-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm text-gray-700 dark:text-gray-300">
+      <thead>
+        <tr class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <th class="px-6 py-3 text-left">Scan Type</th>
+          <th class="px-6 py-3 text-left">Target</th>
+          <th class="px-6 py-3 text-left">Status</th>
+          <th class="px-6 py-3 text-left">Findings</th>
+          <th class="px-6 py-3 text-left">Time</th>
+          <th class="px-6 py-3 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+        {% for result in scan_results %}
+        <tr>
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ result.scan_type }}</td>
+          <td class="px-6 py-4">{{ result.target }}</td>
+          <td class="px-6 py-4">
+            {% if result.status == 'Completed' %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+            {% elif result.status == 'In Progress' %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">In Progress</span>
+            {% else %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ result.status }}</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4">{{ result.findings or '--' }}</td>
+          <td class="px-6 py-4">{{ result.timestamp }}</td>
+          <td class="px-6 py-4">
+            {% if result.status == 'Completed' %}
+              <button class="text-primary hover:text-primary/80">View Details</button>
+            {% else %}
+              <button class="text-primary hover:text-primary/80">Cancel</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 🔍 Log Viewer Section -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
+  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scan Logs</h2>
+  <div class="overflow-y-auto max-h-64 bg-gray-50 dark:bg-gray-900 rounded p-4 text-sm font-mono text-gray-800 dark:text-gray-200 border dark:border-gray-700">
+    {% for line in scan_logs %}
+      <div>{{ line }}</div>
+    {% endfor %}
+  </div>
+</div>
+
+
   <!-- JS -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

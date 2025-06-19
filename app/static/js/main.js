@@ -1,4 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
+function fetchLogs() {
+  fetch('/logs')
+    .then(response => response.json())
+    .then(data => {
+      const logList = document.getElementById('scanLogList');
+      if (logList) {
+        logList.innerHTML = '';
+        data.logs.forEach(line => {
+          const li = document.createElement('li');
+          li.textContent = line.trim();
+          logList.appendChild(li);
+        });
+      }
+    })
+    .catch(err => console.error('Error fetching logs:', err));
+}
+
+// 🔁 Auto-refresh logs every 5 seconds
+setInterval(fetchLogs, 5000);
+fetchLogs(); // initial load
+
   const html = document.documentElement;
   const body = document.body;
   const themeIcon = document.getElementById("theme-icon");
