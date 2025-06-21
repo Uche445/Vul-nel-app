@@ -5,7 +5,6 @@
   <title>SecureScanner Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -19,15 +18,30 @@
       },
     };
   </script>
-
-  <!-- External CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
 </head>
 
 <body class="bg-gray-50 text-gray-800 min-h-screen p-6 transition duration-300">
-  <div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6 relative">
+  <!-- Spinner -->
+  <div id="autoScanSpinner" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 border-opacity-75"></div>
+  </div>
 
+  <!-- Toast: Completed -->
+  <div id="autoScanToast"
+       class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg hidden z-50">
+    ✅ Auto Scan completed!
+  </div>
+
+  <!-- Toast: Scan Phase (filtered flash messages) -->
+  {% for message in get_flashed_messages() %}
+    {% if "Auto scan" not in message %}
+      <div class="bg-green-100 text-green-800 p-2 rounded mb-4">{{ message }}</div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6 relative">
     <!-- Theme toggle icon -->
     <img src="{{ url_for('static', filename='images/moon.png') }}"
          data-moon="{{ url_for('static', filename='images/moon.png') }}"
@@ -46,6 +60,14 @@
       </button>
     </div>
 
+    <!-- ✅ Progress Bar Section -->
+    <div id="scanProgressWrapper" class="mb-4 hidden">
+      <progress id="autoScanProgress" value="0" max="100" class="w-full h-3 rounded overflow-hidden"></progress>
+      <p class="text-center text-sm mt-2 text-indigo-600 font-semibold">
+        <span id="progressText">0%</span> completed
+      </p>
+    </div>
+
     <!-- Scan Type Dropdown -->
     <label for="scanSelector" class="block text-sm font-medium text-gray-700 mb-1">Choose Scan Type</label>
     <select id="scanSelector"
@@ -56,17 +78,6 @@
       <option value="ssh">SSH Scanner</option>
     </select>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="mb-4 text-sm text-green-600">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
     <!-- Scan Form Partials -->
     <div id="portForm">{% include "partials/port_form.html" %}</div>
     <div id="bruteForm" class="hidden">{% include "partials/brute_form.html" %}</div>
@@ -74,11 +85,10 @@
     <div id="sshForm" class="hidden">{% include "partials/ssh_form.html" %}</div>
   </div>
 
- <!-- Scan Results Section -->
+  <!-- Scan Results Section -->
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
   <div class="flex items-center justify-between mb-4">
     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Scan Results</h2>
-    
     <div class="flex items-center space-x-2 text-sm text-gray-500">
       <span>Last updated: just now</span>
       <button class="p-2 text-gray-400 hover:text-primary">
@@ -95,76 +105,62 @@
           <th class="px-6 py-3 text-left">Target</th>
           <th class="px-6 py-3 text-left">Status</th>
           <th class="px-6 py-3 text-left">Findings</th>
-          <th class="px-6 py-3 text-left">Time</th>
-          <th class="px-6 py-3 text-left">Actions</th>
+          <th class="px-6 py-3 text-left">Time & Action</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-  {% for result in scan_results %}
-  <tr>
-    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-      {{ result.scan_type }}
-    </td>
-
-    <td class="px-6 py-4 truncate max-w-[150px]" title="{{ result.target }}">
-      {{ result.target[:30] ~ ('...' if result.target|length > 30 else '') }}
-    </td>
-
-    <td class="px-6 py-4">
-      {% if result.status == 'Completed' %}
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-          ✅ Completed
-        </span>
-      {% elif result.status == 'In Progress' %}
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-          🕒 In Progress
-        </span>
-      {% elif result.status == 'Error' %}
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-          ❌ Error
-        </span>
-      {% else %}
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-          {{ result.status }}
-        </span>
-      {% endif %}
-    </td>
-
-    <td class="px-6 py-4">
-      {{ result.findings or "— No data —" }}
-    </td>
-
-    <td class="px-6 py-4">
-      {{ result.timestamp }}
-    </td>
-
-    <td class="px-6 py-4">
-      <a href="{{ url_for('view_result', result_id=result.id) }}"
-   class="text-indigo-600 hover:underline font-medium text-sm">
-  View Details
-</a>
-
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
-
+        {% for result in scan_results %}
+        <tr>
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ result.scan_type }}</td>
+          <td class="px-6 py-4 truncate max-w-[150px]" title="{{ result.target }}">
+            {{ result.target[:30] ~ ('...' if result.target|length > 30 else '') }}
+          </td>
+          <td class="px-6 py-4">
+            {% if result.status == 'Completed' %}
+              <span class="px-2 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                ✅ <span>Completed</span>
+              </span>
+            {% elif result.status == 'In Progress' %}
+              <span class="px-2 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                ⏳ <span>In Progress</span>
+              </span>
+            {% elif result.status == 'Error' %}
+              <span class="px-2 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                ❌ <span>Error</span>
+              </span>
+            {% else %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                {{ result.status }}
+              </span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4">{{ result.findings or "— No data —" }}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-between gap-4">
+              <span class="text-sm">{{ result.timestamp }}</span>
+              <a href="{{ url_for('view_result', result_id=result.id) }}"
+                 class="text-indigo-600 hover:underline font-medium text-sm whitespace-nowrap">
+                View Details
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
 </div>
 
 
-
-<!-- 🔍 Log Viewer Section -->
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
-  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scan Logs</h2>
-  <div class="overflow-y-auto max-h-64 bg-gray-50 dark:bg-gray-900 rounded p-4 text-sm font-mono text-gray-800 dark:text-gray-200 border dark:border-gray-700">
-    {% for line in scan_logs %}
-      <div>{{ line }}</div>
-    {% endfor %}
+  <!-- 🔍 Log Viewer Section -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scan Logs</h2>
+    <div class="overflow-y-auto max-h-64 bg-gray-50 dark:bg-gray-900 rounded p-4 text-sm font-mono text-gray-800 dark:text-gray-200 border dark:border-gray-700">
+      {% for line in scan_logs %}
+        <div>{{ line }}</div>
+      {% endfor %}
+    </div>
   </div>
-</div>
-
 
   <!-- JS -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

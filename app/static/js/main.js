@@ -1,24 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-function fetchLogs() {
-  fetch('/logs')
-    .then(response => response.json())
-    .then(data => {
-      const logList = document.getElementById('scanLogList');
-      if (logList) {
-        logList.innerHTML = '';
-        data.logs.forEach(line => {
-          const li = document.createElement('li');
-          li.textContent = line.trim();
-          logList.appendChild(li);
-        });
-      }
-    })
-    .catch(err => console.error('Error fetching logs:', err));
-}
+  function fetchLogs() {
+    fetch('/logs')
+      .then(response => response.json())
+      .then(data => {
+        const logList = document.getElementById('scanLogList');
+        if (logList) {
+          logList.innerHTML = '';
+          data.logs.forEach(line => {
+            const li = document.createElement('li');
+            li.textContent = line.trim();
+            logList.appendChild(li);
+          });
+        }
+      })
+      .catch(err => console.error('Error fetching logs:', err));
+  }
 
-// 🔁 Auto-refresh logs every 5 seconds
-setInterval(fetchLogs, 5000);
-fetchLogs(); // initial load
+  setInterval(fetchLogs, 5000);
+  fetchLogs();
 
   const html = document.documentElement;
   const body = document.body;
@@ -52,12 +51,48 @@ fetchLogs(); // initial load
     }
   });
 
-  const scanButton = document.getElementById("startScanBtn");
-  scanButton.addEventListener("click", () => {
-    for (let key in forms) {
-      if (!forms[key].classList.contains("hidden")) {
-        forms[key].querySelector("form").requestSubmit();
-      }
+  function triggerAutoScan() {
+    const progressBar = document.getElementById("autoScanProgress");
+    const toast = document.getElementById("scanPhaseToast");
+    if (progressBar) {
+      progressBar.classList.remove("hidden");
+      progressBar.value = 0;
     }
-  });
+    if (toast) {
+      toast.classList.remove("hidden");
+      toast.textContent = "🔍 Auto Scan started...";
+    }
+
+    fetch("/auto-scan", { method: "POST" })
+      .then(() => {
+        const interval = setInterval(() => {
+          fetch("/auto-scan/progress")
+            .then(res => res.json())
+            .then(data => {
+              if (progressBar) {
+                progressBar.value = data.progress;
+              }
+              if (toast) {
+                toast.textContent = `🔄 Auto Scan Progress: ${data.progress}%`;
+              }
+              if (data.progress >= 100) {
+                clearInterval(interval);
+                if (toast) toast.classList.add("hidden");
+                const completeToast = document.getElementById("autoScanToast");
+                if (completeToast) completeToast.classList.remove("hidden");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }
+            });
+        }, 1000);
+      })
+      .catch(err => console.error("Auto scan failed:", err));
+  }
+
+  const scanButton = document.getElementById("startScanBtn");
+  scanButton.addEventListener("click", triggerAutoScan);
+
+  // ✅ Auto-trigger scan on page load
+  triggerAutoScan();
 });

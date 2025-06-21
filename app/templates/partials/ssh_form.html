@@ -1,15 +1,28 @@
 <form method="POST" action="{{ url_for('scan') }}" class="space-y-4">
-  <input type="hidden" name="scan_type" value="SSH Scan">
+  <input type="hidden" name="scan_type" value="SSH Scanner">
 
   <div>
     <label class="block text-sm font-medium text-gray-700 mb-1">Target Host</label>
     <input type="text" name="host" placeholder="Enter hostname or IP"
+           required
            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
   </div>
 
   <div>
     <label class="block text-sm font-medium text-gray-700 mb-1">Port</label>
-    <input type="text" name="port" placeholder="Default: 22"
+    <input type="number" name="port" placeholder="Default: 22"
+           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Username (optional)</label>
+    <input type="text" name="username" placeholder="e.g. root or admin"
+           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Password (optional)</label>
+    <input type="password" name="password" placeholder="SSH password"
            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
   </div>
 

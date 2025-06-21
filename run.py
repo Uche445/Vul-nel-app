@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from datetime import datetime
 import os
 import csv
@@ -6,6 +6,9 @@ from flask import make_response
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import socket
+import threading
+import time
 
 from app.models import db, ScanResult
 from scanner.port_scanner import scan_ports
@@ -47,7 +50,6 @@ def save_scan_result(scan_type, target, status, findings):
 def index():
     scan_results = ScanResult.query.order_by(ScanResult.id.desc()).all()
 
-    # ✅ Load scan logs
     log_file = os.path.join('logs', 'scan.log')
     scan_logs = []
     if os.path.exists(log_file):
@@ -60,7 +62,6 @@ def index():
 def scan():
     scan_type = request.form.get('scan_type')
 
-    # 🔍 Port Scan
     if scan_type == "Port Scan":
         target = request.form.get("target")
         try:
@@ -81,14 +82,15 @@ def scan():
             flash(f"Open ports on {target}: {findings}")
             save_scan_result("Port Scan", target, "Completed", findings)
 
-    # 🔐 Brute Force
     elif scan_type == "Brute Force":
         target = request.form.get("host")
         service = request.form.get("service")
         wordlist_file = request.files.get("wordlist")
 
         if wordlist_file:
-            wordlist_path = os.path.join("uploads", wordlist_file.filename)
+            upload_dir = os.path.join("uploads")
+            os.makedirs(upload_dir, exist_ok=True)
+            wordlist_path = os.path.join(upload_dir, wordlist_file.filename)
             wordlist_file.save(wordlist_path)
 
             result = brute_force(target, service, wordlist_path)
@@ -101,35 +103,44 @@ def scan():
             flash("No wordlist uploaded.")
             save_scan_result("Brute Force", target, "Error", "Missing wordlist.")
 
-    # 🌐 TCP/IP Scan
     elif scan_type == "TCP/IP Scanner":
         network = request.form.get("network")
         protocol = request.form.get("protocol", "TCP")
-        result = scan_network_range(network, protocol)
+        result = scan_network_range(network)
 
         if "error" in result:
             flash(result["error"])
             save_scan_result("TCP/IP Scanner", network, "Error", result["error"])
         else:
-            findings = f"{len(result['hosts'])} hosts responded"
+            findings = f"{len(result['active_hosts'])} hosts responded"
             flash(findings)
             save_scan_result("TCP/IP Scanner", network, "Completed", findings)
 
-    # 🖥️ SSH Scan
     elif scan_type == "SSH Scanner":
-        target = request.form.get("host")
-        port = request.form.get("port", 22)
+    # 🛡️ Define all needed variables BEFORE try block
+     target = request.form.get("host") or "N/A"
+    port = int(request.form.get("port", 22))
+    username = request.form.get("username")
+    password = request.form.get("password")
 
-        try:
-            result = ssh_check_host(target, int(port))
-            findings = result.get("message", "SSH scan completed.")
-            status = "Completed" if result.get("success") else "Failed"
-        except Exception as e:
-            findings = str(e)
-            status = "Error"
+    try:
+        result = ssh_check_host(target, port, username=username, password=password)
+        status = result.get("status", "Completed")
 
-        flash(f"SSH: {findings}")
-        save_scan_result("SSH Scanner", target, status, findings)
+        findings = ""
+        for item in result.get("findings", []):
+            if isinstance(item, dict):
+                findings += f"{item['title']} (CVE: {', '.join(item['cve']) or 'N/A'}) - Fix: {item['remediation']}\n"
+            else:
+                findings += f"{item}\n"
+
+        flash(f"SSH Scan complete for {target}")
+        save_scan_result("SSH Scanner", target, status, findings.strip())
+
+    except Exception as e:
+        flash(f"SSH Scan failed: {str(e)}")
+        save_scan_result("SSH Scanner", target, "Error", str(e))
+
 
     else:
         flash(f"{scan_type} scan initiated (not implemented).")
@@ -137,6 +148,79 @@ def scan():
         save_scan_result(scan_type, target, "Pending", "Scan queued or not implemented.")
 
     return redirect(url_for('index'))
+
+@app.route('/auto-scan', methods=['POST'])
+def auto_scan():
+    try:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_path = os.path.join("logs", "scan.log")
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
+        with open(log_path, 'a', encoding='utf-8') as log:
+            log.write(f"[INFO] Auto scan triggered at {timestamp}\n")
+
+        hostname = socket.gethostname()
+        local_ip = socket.gethostbyname(hostname)
+        subnet = ".".join(local_ip.split(".")[:3]) + ".0/24"
+
+        progress_path = os.path.join("logs", "progress.txt")
+        with open(progress_path, "w") as f:
+            f.write("0")
+
+        # TCP/IP Scan
+        tcp_result = scan_network_range(subnet)
+        with open(progress_path, "w") as f:
+            f.write("33")
+
+        if "error" not in tcp_result:
+            save_scan_result("TCP/IP Scanner", subnet, "Completed",
+                             f"{len(tcp_result['active_hosts'])} hosts responded")
+
+        # SSH Scan
+        for host in tcp_result.get("active_hosts", []):
+            try:
+                result = ssh_check_host(host, 22)
+                status = "Completed" if result.get("success") else "Failed"
+                save_scan_result("SSH Scanner", host, status, result.get("message", ""))
+            except Exception as e:
+                save_scan_result("SSH Scanner", host, "Error", str(e))
+
+        with open(progress_path, "w") as f:
+            f.write("66")
+
+        # Port Scan
+        port_result = scan_ports(local_ip, 20, 1024)
+        if "error" not in port_result:
+            ports = port_result['open_ports']
+            findings = f"{len(ports)} open ports: {', '.join(map(str, ports))}"
+            save_scan_result("Port Scan", local_ip, "Completed", findings)
+
+        # ✅ Auto Scan summary (YAML-style plaintext)
+        port_summary = f"Port Scan: {len(ports)} open ports ({', '.join(map(str, ports))})"
+        tcp_summary = f"TCP/IP Scanner: {len(tcp_result['active_hosts'])} hosts alive"
+        ssh_summary = "SSH Scanner: SSH service accessible"
+
+        auto_findings = f"{port_summary}\n{tcp_summary}\n{ssh_summary}"
+        save_scan_result("Auto Scan", local_ip, "Completed", auto_findings)
+
+        with open(progress_path, "w") as f:
+            f.write("100")
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        with open("logs/scan.log", "a", encoding='utf-8') as log:
+            log.write(f"[ERROR] Auto scan failed: {str(e)}\n")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/auto-scan/progress')
+def auto_scan_progress():
+    progress_path = os.path.join("logs", "progress.txt")
+    if os.path.exists(progress_path):
+        with open(progress_path, "r") as f:
+            percent = f.read().strip()
+        return jsonify({"progress": percent})
+    return jsonify({"progress": "0"})
 
 @app.route('/result/<int:result_id>')
 def view_result(result_id):
@@ -161,8 +245,6 @@ def export_csv():
     response.headers['Content-Type'] = 'text/csv'
     return response
 
-
-# ✅ PDF Export Route
 @app.route('/export/pdf/<int:result_id>')
 def export_pdf(result_id):
     result = ScanResult.query.get_or_404(result_id)
