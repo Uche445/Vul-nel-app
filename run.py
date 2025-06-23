@@ -1,22 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, make_response
 from datetime import datetime
 import os
 import csv
-from flask import make_response
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import socket
-import threading
-import time
 
 from app.models import db, ScanResult
 from scanner.port_scanner import scan_ports
 from scanner.brute_force import brute_force
 from scanner.tcp_ip_scanner import scan_network_range
 from scanner.ssh_scanner import ssh_check_host
+from scanner.banner_grabber import grab_banner
+from scanner.cve_mapper import map_banner_to_cves
+from scanner.service_fingerprint import guess_protocol_and_fingerprint
 
-# ✅ Flask app setup
 app = Flask(
     __name__,
     template_folder=os.path.join("app", "templates"),
@@ -24,17 +23,13 @@ app = Flask(
     static_url_path='/static'
 )
 app.secret_key = 'top_secret'
-
-# ✅ SQLAlchemy config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///scan_results.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-# ✅ Create DB tables
 with app.app_context():
     db.create_all()
 
-# ✅ Reusable scan saving logic
 def save_scan_result(scan_type, target, status, findings):
     result = ScanResult(
         scan_type=scan_type,
@@ -48,14 +43,13 @@ def save_scan_result(scan_type, target, status, findings):
 
 @app.route('/')
 def index():
-    scan_results = ScanResult.query.order_by(ScanResult.id.desc()).all()
+    scan_results = ScanResult.query.order_by(ScanResult.id.desc()).limit(20).all()
 
     log_file = os.path.join('logs', 'scan.log')
     scan_logs = []
     if os.path.exists(log_file):
         with open(log_file, 'r') as f:
             scan_logs = f.readlines()
-
     return render_template('dashboard.html', scan_results=scan_results, scan_logs=scan_logs)
 
 @app.route('/scan', methods=['POST'])
@@ -78,9 +72,38 @@ def scan():
             save_scan_result("Port Scan", target, "Error", result["error"])
         else:
             ports = result['open_ports']
-            findings = f"{len(ports)} open ports: {', '.join(map(str, ports))}"
-            flash(f"Open ports on {target}: {findings}")
-            save_scan_result("Port Scan", target, "Completed", findings)
+            findings = f"{len(ports)} open ports: {', '.join(map(str, ports))}\n"
+
+            for port in ports:
+                banner_info = grab_banner(target, port)
+
+                if isinstance(banner_info, dict) and "error" in banner_info:
+                    banner = f"Error grabbing banner: {banner_info['error']}"
+                    cves = []
+                    protocol, fingerprint = "Unknown", "Unavailable"
+                elif isinstance(banner_info, dict):
+                    banner = banner_info.get("banner", "No banner returned")
+                    cves = map_banner_to_cves(banner)
+                    protocol, fingerprint = guess_protocol_and_fingerprint(target, port)
+
+                else:
+                    banner = str(banner_info)
+                    cves = map_banner_to_cves(banner)
+                    protocol, fingerprint = guess_protocol_and_fingerprint(target, port)
+
+                findings += f"\nPort {port} - Protocol: {protocol}, Fingerprint: {fingerprint}\n"
+                findings += f"  Banner: {banner}\n"
+
+                if cves:
+                    for cve in cves:
+                        findings += f"  - {cve['cve']}: {cve['title']} ({cve['severity']})\n"
+                        findings += f"    > {cve['description']}\n"
+                        findings += f"    Fix: {cve['remediation']}\n"
+                else:
+                    findings += "  - No known CVEs found.\n"
+
+            flash(f"Port scan completed for {target}")
+            save_scan_result("Port Scan", target, "Completed", findings.strip())
 
     elif scan_type == "Brute Force":
         target = request.form.get("host")
@@ -105,7 +128,6 @@ def scan():
 
     elif scan_type == "TCP/IP Scanner":
         network = request.form.get("network")
-        protocol = request.form.get("protocol", "TCP")
         result = scan_network_range(network)
 
         if "error" in result:
@@ -117,34 +139,32 @@ def scan():
             save_scan_result("TCP/IP Scanner", network, "Completed", findings)
 
     elif scan_type == "SSH Scanner":
-    # 🛡️ Define all needed variables BEFORE try block
-     target = request.form.get("host") or "N/A"
-    port = int(request.form.get("port", 22))
-    username = request.form.get("username")
-    password = request.form.get("password")
+        target = request.form.get("host") or "N/A"
+        port = int(request.form.get("port", 22))
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-    try:
-        result = ssh_check_host(target, port, username=username, password=password)
-        status = result.get("status", "Completed")
+        try:
+            result = ssh_check_host(target, port, username=username, password=password)
+            status = result.get("status", "Completed")
 
-        findings = ""
-        for item in result.get("findings", []):
-            if isinstance(item, dict):
-                findings += f"{item['title']} (CVE: {', '.join(item['cve']) or 'N/A'}) - Fix: {item['remediation']}\n"
-            else:
-                findings += f"{item}\n"
+            findings = ""
+            for item in result.get("findings", []):
+                if isinstance(item, dict):
+                    findings += f"{item['title']} (CVE: {', '.join(item['cve']) or 'N/A'}) - Fix: {item['remediation']}\n"
+                else:
+                    findings += f"{item}\n"
 
-        flash(f"SSH Scan complete for {target}")
-        save_scan_result("SSH Scanner", target, status, findings.strip())
+            flash(f"SSH Scan complete for {target}")
+            save_scan_result("SSH Scanner", target, status, findings.strip())
 
-    except Exception as e:
-        flash(f"SSH Scan failed: {str(e)}")
-        save_scan_result("SSH Scanner", target, "Error", str(e))
-
+        except Exception as e:
+            flash(f"SSH Scan failed: {str(e)}")
+            save_scan_result("SSH Scanner", target, "Error", str(e))
 
     else:
-        flash(f"{scan_type} scan initiated (not implemented).")
         target = request.form.get('target') or request.form.get('host') or request.form.get('network')
+        flash(f"{scan_type} scan initiated (not implemented).")
         save_scan_result(scan_type, target, "Pending", "Scan queued or not implemented.")
 
     return redirect(url_for('index'))
@@ -167,7 +187,6 @@ def auto_scan():
         with open(progress_path, "w") as f:
             f.write("0")
 
-        # TCP/IP Scan
         tcp_result = scan_network_range(subnet)
         with open(progress_path, "w") as f:
             f.write("33")
@@ -176,7 +195,6 @@ def auto_scan():
             save_scan_result("TCP/IP Scanner", subnet, "Completed",
                              f"{len(tcp_result['active_hosts'])} hosts responded")
 
-        # SSH Scan
         for host in tcp_result.get("active_hosts", []):
             try:
                 result = ssh_check_host(host, 22)
@@ -188,16 +206,15 @@ def auto_scan():
         with open(progress_path, "w") as f:
             f.write("66")
 
-        # Port Scan
+        ports = []
         port_result = scan_ports(local_ip, 20, 1024)
         if "error" not in port_result:
             ports = port_result['open_ports']
             findings = f"{len(ports)} open ports: {', '.join(map(str, ports))}"
             save_scan_result("Port Scan", local_ip, "Completed", findings)
 
-        # ✅ Auto Scan summary (YAML-style plaintext)
         port_summary = f"Port Scan: {len(ports)} open ports ({', '.join(map(str, ports))})"
-        tcp_summary = f"TCP/IP Scanner: {len(tcp_result['active_hosts'])} hosts alive"
+        tcp_summary = f"TCP/IP Scanner: {len(tcp_result.get('active_hosts', []))} hosts alive"
         ssh_summary = "SSH Scanner: SSH service accessible"
 
         auto_findings = f"{port_summary}\n{tcp_summary}\n{ssh_summary}"
@@ -230,17 +247,13 @@ def view_result(result_id):
 @app.route('/export/csv')
 def export_csv():
     results = ScanResult.query.order_by(ScanResult.id.desc()).all()
-
-    output = []
-    output.append(['Scan Type', 'Target', 'Status', 'Findings', 'Timestamp'])
-
+    output = [['Scan Type', 'Target', 'Status', 'Findings', 'Timestamp']]
     for r in results:
         output.append([r.scan_type, r.target, r.status, r.findings, r.timestamp])
 
     response = make_response()
     writer = csv.writer(response)
     writer.writerows(output)
-
     response.headers['Content-Disposition'] = 'attachment; filename=scan_results.csv'
     response.headers['Content-Type'] = 'text/csv'
     return response

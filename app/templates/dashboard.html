@@ -152,15 +152,20 @@
 </div>
 
 
-  <!-- 🔍 Log Viewer Section -->
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
-    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scan Logs</h2>
-    <div class="overflow-y-auto max-h-64 bg-gray-50 dark:bg-gray-900 rounded p-4 text-sm font-mono text-gray-800 dark:text-gray-200 border dark:border-gray-700">
-      {% for line in scan_logs %}
-        <div>{{ line }}</div>
-      {% endfor %}
-    </div>
+  {# 
+<!-- 🔍 Log Viewer Section -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-8">
+  <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Scan Logs</h2>
+  <div class="overflow-y-auto max-h-64 bg-gray-50 dark:bg-gray-900 rounded p-4 text-sm font-mono text-gray-800 dark:text-gray-200 border dark:border-gray-700">
+    {% for line in scan_logs %}
+      <div>{{ line }}</div>
+    {% endfor %}
   </div>
+</div>
+#}
+
+
+  
 
   <!-- JS -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>

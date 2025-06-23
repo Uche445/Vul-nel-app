@@ -90,9 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(err => console.error("Auto scan failed:", err));
   }
 
-  const scanButton = document.getElementById("startScanBtn");
+    const scanButton = document.getElementById("startScanBtn");
   scanButton.addEventListener("click", triggerAutoScan);
 
-  // ✅ Auto-trigger scan on page load
-  triggerAutoScan();
+  // triggerAutoScan();  <-- ❌ Disable this line to stop auto-run
 });
+
+
+  
